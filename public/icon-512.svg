@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0c1a1f"/>
+      <stop offset="100%" stop-color="#162a32"/>
+    </linearGradient>
+    <linearGradient id="gd" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#c8965a"/>
+      <stop offset="100%" stop-color="#e0b87a"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="100" fill="url(#bg)"/>
+  <!-- Sun -->
+  <circle cx="256" cy="180" r="50" fill="url(#gd)" opacity=".9"/>
+  <g stroke="#e0b87a" stroke-width="3" fill="none" opacity=".5">
+    <line x1="256" y1="110" x2="256" y2="95"/>
+    <line x1="256" y1="250" x2="256" y2="265"/>
+    <line x1="186" y1="180" x2="171" y2="180"/>
+    <line x1="326" y1="180" x2="341" y2="180"/>
+    <line x1="206" y1="130" x2="196" y2="120"/>
+    <line x1="306" y1="230" x2="316" y2="240"/>
+    <line x1="306" y1="130" x2="316" y2="120"/>
+    <line x1="206" y1="230" x2="196" y2="240"/>
+  </g>
+  <!-- Waves -->
+  <path d="M60 310 Q130 280 200 310 Q270 340 340 310 Q410 280 452 310" stroke="#1a7a8a" stroke-width="4" fill="none" opacity=".6"/>
+  <path d="M60 340 Q130 310 200 340 Q270 370 340 340 Q410 310 452 340" stroke="#1a7a8a" stroke-width="3" fill="none" opacity=".4"/>
+  <!-- Text -->
+  <text x="256" y="420" text-anchor="middle" font-family="Georgia, serif" font-size="72" font-weight="300" font-style="italic" fill="#f4efe6" letter-spacing="6">Grèce</text>
+  <text x="256" y="460" text-anchor="middle" font-family="system-ui, sans-serif" font-size="20" font-weight="600" fill="#c8965a" letter-spacing="8" text-transform="uppercase">ÉTÉ 2026</text>
+</svg>
