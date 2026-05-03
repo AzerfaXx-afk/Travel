@@ -294,11 +294,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const it = [];
         const duration = trip.duration;
         const destName = trip.dest;
+        const baseCoords = trip.coords || [46, 2];
         
         // Day 1
-        it.push({ day: 1, title: `Vol vers ${destName}`, subtitle: "Arrivée et check-in à l'hôtel", icon: "flight" });
+        it.push({ day: 1, title: `Vol vers ${destName}`, subtitle: "Aéroport principal", icon: "flight", coords: baseCoords });
         if (duration > 1 && trip.pois.length > 0) {
-            it.push({ day: 1, title: "Découverte des environs", subtitle: "Balade légère et restaurant local", icon: "restaurant" });
+            // slight offset for variety
+            const offsetCoords = [baseCoords[0] + 0.05, baseCoords[1] + 0.05];
+            it.push({ day: 1, title: "Découverte des environs", subtitle: "Balade et restaurant local", icon: "restaurant", coords: offsetCoords });
         }
 
         // Middle Days (distribute POIs)
@@ -307,23 +310,22 @@ document.addEventListener('DOMContentLoaded', () => {
             for (let d = 2; d < duration; d++) {
                 if (poiIndex < trip.pois.length) {
                     let poi = trip.pois[poiIndex];
-                    it.push({ day: d, title: `Visite : ${poi.name}`, subtitle: "Recommandation Odyssée", icon: poi.icon });
+                    it.push({ day: d, title: `Visite : ${poi.name}`, subtitle: "Recommandation Odyssée", icon: poi.icon, coords: poi.coords });
                     poiIndex++;
                 } else {
-                    it.push({ day: d, title: "Journée libre", subtitle: "Shopping ou détente à la plage", icon: "beach_access" });
+                    it.push({ day: d, title: "Journée libre", subtitle: "Shopping ou détente", icon: "beach_access", coords: baseCoords });
                 }
                 
                 // Add a restaurant every other day
                 if (d % 2 === 0) {
-                    it.push({ day: d, title: "Dîner gastronomique", subtitle: "Réservation suggérée", icon: "restaurant" });
+                    it.push({ day: d, title: "Dîner local", subtitle: "Réservation suggérée", icon: "restaurant" });
                 }
             }
         }
 
         // Last Day
         if (duration > 1) {
-            it.push({ day: duration, title: "Derniers achats", subtitle: "Souvenirs et photos", icon: "local_mall" });
-            it.push({ day: duration, title: "Vol retour", subtitle: "Départ pour la maison", icon: "flight_takeoff" });
+            it.push({ day: duration, title: "Vol retour", subtitle: "Départ pour la maison", icon: "flight_takeoff", coords: baseCoords });
         }
 
         return it;
@@ -553,21 +555,49 @@ document.addEventListener('DOMContentLoaded', () => {
         markers.forEach(m => map.removeLayer(m));
         markers = [];
 
-        if (activeTrip && activeTrip.pois) {
-            activeTrip.pois.forEach(poi => {
-                const iconHtml = `<div style="background:var(--primary); color:white; width:36px; height:36px; border-radius:50%; display:flex; justify-content:center; align-items:center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); border: 2px solid white;"><span class="material-icons-round" style="font-size:20px;">${poi.icon}</span></div>`;
-                const customIcon = L.divIcon({
-                    html: iconHtml,
-                    className: 'custom-leaflet-marker',
-                    iconSize: [36, 36],
-                    iconAnchor: [18, 36],
-                    popupAnchor: [0, -36]
-                });
-                const marker = L.marker(poi.coords, { icon: customIcon })
-                    .addTo(map)
-                    .bindPopup(`<b>${poi.name}</b><br>Recommandation Odyssée`);
-                markers.push(marker);
+        if (activeTrip && activeTrip.itinerary) {
+            let pathCoords = [];
+
+            // Draw markers for itinerary steps that have coords
+            activeTrip.itinerary.forEach(step => {
+                if (step.coords) {
+                    pathCoords.push(step.coords);
+                    
+                    const iconHtml = `<div style="background:var(--primary); color:white; width:36px; height:36px; border-radius:50%; display:flex; justify-content:center; align-items:center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); border: 2px solid white;"><span class="material-icons-round" style="font-size:20px;">${step.icon}</span></div>`;
+                    const customIcon = L.divIcon({
+                        html: iconHtml,
+                        className: 'custom-leaflet-marker',
+                        iconSize: [36, 36],
+                        iconAnchor: [18, 36],
+                        popupAnchor: [0, -36]
+                    });
+                    const marker = L.marker(step.coords, { icon: customIcon })
+                        .addTo(map)
+                        .bindPopup(`<b>Jour ${step.day}</b><br>${step.title}`);
+                    markers.push(marker);
+                }
             });
+
+            // Draw route polyline
+            if (pathCoords.length > 1) {
+                const routeLine = L.polyline(pathCoords, {
+                    color: '#FF7B54', // App Primary Color
+                    weight: 4,
+                    opacity: 0.8,
+                    dashArray: '10, 10', // Dashed line for travel route
+                    lineJoin: 'round'
+                }).addTo(map);
+                markers.push(routeLine);
+                
+                // Fit bounds to show whole trip nicely
+                setTimeout(() => { 
+                    map.invalidateSize(); 
+                    map.fitBounds(routeLine.getBounds(), { padding: [50, 50], maxZoom: 12 });
+                }, 300);
+            } else {
+                setTimeout(() => { map.invalidateSize(); }, 300);
+            }
+        } else {
             setTimeout(() => { map.invalidateSize(); }, 300);
         }
     };
