@@ -1,22 +1,25 @@
-const CACHE = 'grece2026-v1';
-const ASSETS = ['/'];
+const CACHE_NAME = 'odyssee-v1';
+const ASSETS_TO_CACHE = [
+  '/',
+  '/index.html',
+  '/style.css',
+  '/main.js',
+  '/logo.png',
+  '/manifest.json'
+];
 
-self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
-  self.skipWaiting();
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(ASSETS_TO_CACHE);
+    })
+  );
 });
 
-self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))));
-  self.clients.claim();
-});
-
-self.addEventListener('fetch', e => {
-  e.respondWith(
-    fetch(e.request).then(r => {
-      const clone = r.clone();
-      caches.open(CACHE).then(c => c.put(e.request, clone));
-      return r;
-    }).catch(() => caches.match(e.request))
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    caches.match(event.request).then((response) => {
+      return response || fetch(event.request);
+    })
   );
 });

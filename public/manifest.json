@@ -1,10 +1,10 @@
 {
-  "name": "WanderPlan",
-  "short_name": "WanderPlan",
+  "name": "Odyssée",
+  "short_name": "Odyssée",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#0D8ABC",
+  "theme_color": "#FF7B54",
   "icons": [
     {
       "src": "/logo.png",

@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-theme="light">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <meta name="theme-color" content="#ffffff" />
+    <meta name="theme-color" content="#FF7B54" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <title>WanderPlan - Travel App</title>
+    <title>Odyssée - L'app de vos voyages</title>
     <link rel="icon" type="image/png" href="/logo.png" />
     <link rel="apple-touch-icon" href="/logo.png" />
     <link rel="manifest" href="/manifest.json" />
@@ -18,177 +18,251 @@
     <!-- App Loading Screen -->
     <div id="app-loader">
         <div class="loader-content">
-            <img src="/logo.png" alt="WanderPlan Logo" class="loader-logo" />
-            <h1 class="loader-title">WanderPlan</h1>
+            <img src="/logo.png" alt="Odyssée Logo" class="loader-logo" />
+            <h1 class="loader-title">Odyssée</h1>
             <div class="loader-spinner"></div>
         </div>
     </div>
 
+    <!-- Pull to Refresh Visual Indicator -->
+    <div id="ptr-indicator">
+        <span class="material-icons-round ptr-icon">flight_takeoff</span>
+    </div>
+
     <!-- Main App Container -->
     <div id="app-container">
-        <!-- Pull to Refresh Visual Indicator -->
-        <div id="ptr-indicator">
-            <span class="material-icons-round ptr-icon">flight_takeoff</span>
-        </div>
-
-        <!-- Scrollable Content -->
+        
         <main id="app-content">
-            <!-- Header -->
-            <header class="app-header">
-                <div class="header-user">
-                    <img src="https://ui-avatars.com/api/?name=Adam&background=0D8ABC&color=fff&rounded=true&bold=true" alt="User" class="avatar" />
-                    <div class="greeting">
-                        <span class="greeting-sub">Bonjour,</span>
-                        <h2 class="greeting-name">Adam !</h2>
+            <!-- ================= VIEW: HOME ================= -->
+            <div id="view-home" class="view active">
+                <header class="app-header">
+                    <div class="header-user">
+                        <img src="https://ui-avatars.com/api/?name=Adam&background=FF7B54&color=fff&rounded=true&bold=true" alt="User" class="avatar" />
+                        <div class="greeting">
+                            <span class="greeting-sub">Prêt pour l'aventure,</span>
+                            <h2 class="greeting-name">Adam ?</h2>
+                        </div>
                     </div>
+                    <button class="icon-btn"><span class="material-icons-round">notifications_none</span></button>
+                </header>
+
+                <div class="page-content">
+                    <div class="search-container">
+                        <span class="material-icons-round search-icon">search</span>
+                        <input type="text" placeholder="Rechercher un voyage, une ville..." class="search-input" />
+                    </div>
+
+                    <section class="section">
+                        <div class="section-header">
+                            <h3>Mes Groupes & Voyages</h3>
+                            <a href="#" class="view-all">Tout voir</a>
+                        </div>
+                        <div class="horizontal-scroll">
+                            <div class="trip-card">
+                                <div class="trip-image" style="background-image: url('https://images.unsplash.com/photo-1516483638261-f40af5aa32c6?auto=format&fit=crop&w=500&q=80')">
+                                    <div class="trip-badge">Dans 45 Jours</div>
+                                </div>
+                                <div class="trip-info">
+                                    <h4>Odyssée Grecque 🇬🇷</h4>
+                                    <p>Santorin & Mykonos</p>
+                                    <div class="trip-friends">
+                                        <img src="https://ui-avatars.com/api/?name=Léa&background=2D3142&color=fff&rounded=true" class="friend-avatar" />
+                                        <img src="https://ui-avatars.com/api/?name=Sam&background=0D8ABC&color=fff&rounded=true" class="friend-avatar" />
+                                        <div class="friend-avatar more">+2</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="trip-card">
+                                <div class="trip-image" style="background-image: url('https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?auto=format&fit=crop&w=500&q=80')">
+                                    <div class="trip-badge">Terminé</div>
+                                </div>
+                                <div class="trip-info">
+                                    <h4>Roadtrip Italie 🇮🇹</h4>
+                                    <p>Côte Amalfitaine</p>
+                                    <div class="trip-friends">
+                                        <img src="https://ui-avatars.com/api/?name=Max&background=939b62&color=fff&rounded=true" class="friend-avatar" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="section">
+                        <div class="section-header">
+                            <h3>À venir (Grèce)</h3>
+                        </div>
+                        <div class="itinerary-timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-time">Jour 1</div>
+                                <div class="timeline-dot flight"><span class="material-icons-round">flight</span></div>
+                                <div class="timeline-content">
+                                    <h4>Vol AF1234</h4>
+                                    <p>Paris CDG ➔ Athènes</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-time">Jour 2</div>
+                                <div class="timeline-dot hotel"><span class="material-icons-round">sailing</span></div>
+                                <div class="timeline-content">
+                                    <h4>Ferry vers Santorin</h4>
+                                    <p>Départ port du Pirée (07h00)</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <div style="height: 100px;"></div>
                 </div>
-                <button class="icon-btn"><span class="material-icons-round">notifications_none</span></button>
-            </header>
+            </div>
 
-            <div class="page-content">
-                <!-- Search Bar -->
-                <div class="search-container">
-                    <span class="material-icons-round search-icon">search</span>
-                    <input type="text" placeholder="Où voulez-vous aller ?" class="search-input" />
-                    <button class="filter-btn"><span class="material-icons-round">tune</span></button>
+            <!-- ================= VIEW: MAP ================= -->
+            <div id="view-map" class="view">
+                <header class="app-header">
+                    <h2>Carte Interactive</h2>
+                </header>
+                <div class="page-content" style="height: calc(100vh - 180px); display: flex; align-items: center; justify-content: center; flex-direction: column;">
+                    <span class="material-icons-round" style="font-size: 64px; color: var(--primary); margin-bottom: 16px;">map</span>
+                    <h3 style="margin-bottom: 8px;">Explorez le monde</h3>
+                    <p style="text-align: center; color: var(--text-muted);">La carte avec les épingles de vos amis s'affichera ici.</p>
                 </div>
+            </div>
 
-                <!-- Trips section -->
-                <section class="section">
-                    <div class="section-header">
-                        <h3>Mes Voyages</h3>
-                        <a href="#" class="view-all">Tout voir</a>
-                    </div>
-                    <div class="horizontal-scroll">
-                        <div class="trip-card">
-                            <div class="trip-image" style="background-image: url('https://images.unsplash.com/photo-1516483638261-f40af5aa32c6?auto=format&fit=crop&w=500&q=80')">
-                                <div class="trip-badge">12 Jours</div>
-                            </div>
-                            <div class="trip-info">
-                                <h4>Îles Grecques</h4>
-                                <p>12 Août - 24 Août</p>
-                                <div class="trip-friends">
-                                    <img src="https://ui-avatars.com/api/?name=L&background=ff7b54&color=fff&rounded=true" class="friend-avatar" />
-                                    <img src="https://ui-avatars.com/api/?name=S&background=ffd56b&color=fff&rounded=true" class="friend-avatar" />
-                                    <div class="friend-avatar more">+2</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="trip-card">
-                            <div class="trip-image" style="background-image: url('https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&w=500&q=80')">
-                                <div class="trip-badge">4 Jours</div>
-                            </div>
-                            <div class="trip-info">
-                                <h4>Paris Express</h4>
-                                <p>5 Sept - 8 Sept</p>
-                                <div class="trip-friends">
-                                    <img src="https://ui-avatars.com/api/?name=M&background=939b62&color=fff&rounded=true" class="friend-avatar" />
-                                </div>
-                            </div>
-                        </div>
-                        <div class="trip-card add-trip">
-                            <div class="add-trip-content">
-                                <div class="add-icon">
-                                    <span class="material-icons-round">add</span>
-                                </div>
-                                <span>Nouveau voyage</span>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Next Steps / Itinerary -->
-                <section class="section">
-                    <div class="section-header">
-                        <h3>Programme de la Grèce</h3>
-                    </div>
-                    
-                    <div class="itinerary-timeline">
-                        <div class="timeline-item">
-                            <div class="timeline-time">10:00</div>
-                            <div class="timeline-dot flight">
-                                <span class="material-icons-round">flight</span>
-                            </div>
-                            <div class="timeline-content">
-                                <h4>Vol AF1234</h4>
-                                <p>Paris CDG ➔ Athènes</p>
-                            </div>
-                        </div>
-                        
-                        <div class="timeline-item">
-                            <div class="timeline-time">15:30</div>
-                            <div class="timeline-dot hotel">
-                                <span class="material-icons-round">hotel</span>
-                            </div>
-                            <div class="timeline-content">
-                                <h4>Check-in Airbnb</h4>
-                                <p>Plaka, Centre ville</p>
-                            </div>
-                        </div>
-
-                        <div class="timeline-item">
-                            <div class="timeline-time">20:00</div>
-                            <div class="timeline-dot food">
-                                <span class="material-icons-round">restaurant</span>
-                            </div>
-                            <div class="timeline-content">
-                                <h4>Dîner Taverna</h4>
-                                <p>Réservation pour 4 personnes</p>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Budget Summary -->
-                <section class="section">
-                    <div class="budget-card">
+            <!-- ================= VIEW: BUDGET ================= -->
+            <div id="view-budget" class="view">
+                <header class="app-header">
+                    <h2>Finances du groupe</h2>
+                </header>
+                <div class="page-content">
+                    <div class="budget-card" style="margin-top: 16px;">
                         <div class="budget-header">
                             <div>
-                                <span class="budget-title">Budget Commun</span>
+                                <span class="budget-title">Dépenses Totales (Grèce)</span>
                                 <h3 class="budget-amount">845,00 €</h3>
                             </div>
                             <div class="budget-icon">
                                 <span class="material-icons-round">account_balance_wallet</span>
                             </div>
                         </div>
-                        <div class="budget-progress">
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 65%;"></div>
-                            </div>
-                            <div class="progress-labels">
-                                <span>Dépensé</span>
-                                <span>Total estimé: 1300€</span>
-                            </div>
-                        </div>
-                        <button class="budget-btn">Ajouter une dépense</button>
+                        <button class="budget-btn" id="btn-add-expense">Ajouter une dépense</button>
                     </div>
-                </section>
-                
-                <!-- Spacer for bottom nav -->
-                <div style="height: 100px;"></div>
+
+                    <h3 style="margin: 24px 0 16px;">Qui doit quoi ?</h3>
+                    <div class="balance-list">
+                        <div class="balance-item">
+                            <img src="https://ui-avatars.com/api/?name=Sam&background=0D8ABC&color=fff&rounded=true" class="avatar-sm" />
+                            <div class="balance-info">
+                                <h4>Sam te doit</h4>
+                                <p>Pour "Airbnb Athènes"</p>
+                            </div>
+                            <div class="balance-amount positive">+ 125,00 €</div>
+                        </div>
+                        <div class="balance-item">
+                            <img src="https://ui-avatars.com/api/?name=Léa&background=2D3142&color=fff&rounded=true" class="avatar-sm" />
+                            <div class="balance-info">
+                                <h4>Tu dois à Léa</h4>
+                                <p>Pour "Location Bateau"</p>
+                            </div>
+                            <div class="balance-amount negative">- 45,00 €</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= VIEW: PROFILE ================= -->
+            <div id="view-profile" class="view">
+                <header class="app-header">
+                    <h2>Mon Profil</h2>
+                </header>
+                <div class="page-content">
+                    <div style="text-align: center; margin: 32px 0;">
+                        <img src="https://ui-avatars.com/api/?name=Adam&background=FF7B54&color=fff&rounded=true&bold=true&size=128" alt="User" style="border-radius: 50%; box-shadow: var(--shadow-sm); margin-bottom: 16px;" />
+                        <h3>Adam</h3>
+                        <p style="color: var(--text-muted);">Explorateur passionné</p>
+                    </div>
+
+                    <div class="settings-group">
+                        <div class="setting-item">
+                            <div class="setting-left">
+                                <span class="material-icons-round">dark_mode</span>
+                                <span>Thème Sombre</span>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="theme-toggle">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-left">
+                                <span class="material-icons-round">notifications</span>
+                                <span>Notifications push</span>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
             </div>
         </main>
 
+        <!-- ================= NEW TRIP MODAL (Full Screen) ================= -->
+        <div id="modal-new-trip" class="modal-fullscreen hidden">
+            <div class="modal-header">
+                <button class="icon-btn close-modal"><span class="material-icons-round">close</span></button>
+                <h3>Nouveau Voyage</h3>
+                <button class="text-btn primary" id="btn-create-trip">Créer</button>
+            </div>
+            <div class="modal-content">
+                <div class="form-group">
+                    <label>Où voulez-vous aller ?</label>
+                    <div class="search-container" style="margin-bottom: 16px;">
+                        <span class="material-icons-round search-icon">public</span>
+                        <input type="text" id="destination-input" placeholder="Ex: Japon, Bali, Mexique..." class="search-input" />
+                    </div>
+                </div>
+
+                <!-- Suggestions (Populated via JS) -->
+                <div id="destination-suggestions" class="suggestions-grid">
+                    <!-- Cards will be injected here -->
+                </div>
+
+                <div class="form-group" style="margin-top: 32px;">
+                    <label>Inviter des amis au groupe</label>
+                    <div class="friends-invite-list">
+                        <div class="friend-pill">
+                            <img src="https://ui-avatars.com/api/?name=Léa" /> Léa
+                        </div>
+                        <div class="friend-pill">
+                            <img src="https://ui-avatars.com/api/?name=Sam" /> Sam
+                        </div>
+                        <div class="friend-pill add">
+                            <span class="material-icons-round">add</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Bottom Navigation -->
         <nav class="bottom-nav">
-            <a href="#" class="nav-item active">
+            <a href="#" class="nav-item active" data-target="view-home">
                 <span class="material-icons-round">explore</span>
                 <span>Accueil</span>
             </a>
-            <a href="#" class="nav-item">
+            <a href="#" class="nav-item" data-target="view-map">
                 <span class="material-icons-round">map</span>
                 <span>Carte</span>
             </a>
-            <a href="#" class="nav-item fab-wrapper">
+            <a href="#" class="nav-item fab-wrapper" id="btn-open-new-trip">
                 <div class="fab">
                     <span class="material-icons-round">add</span>
                 </div>
             </a>
-            <a href="#" class="nav-item">
+            <a href="#" class="nav-item" data-target="view-budget">
                 <span class="material-icons-round">receipt_long</span>
                 <span>Dépenses</span>
             </a>
-            <a href="#" class="nav-item">
+            <a href="#" class="nav-item" data-target="view-profile">
                 <span class="material-icons-round">person</span>
                 <span>Profil</span>
             </a>
