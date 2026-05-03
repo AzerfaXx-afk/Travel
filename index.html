@@ -218,6 +218,40 @@
             </div>
         </div>
 
+        <!-- ================= NEW STEP MODAL ================= -->
+        <div id="modal-new-step" class="modal-fullscreen hidden">
+            <div class="modal-header">
+                <button class="icon-btn close-modal-step"><span class="material-icons-round">close</span></button>
+                <h3>Ajouter une étape</h3>
+                <button class="text-btn primary" id="btn-save-step">Ajouter</button>
+            </div>
+            <div class="modal-content">
+                <div class="form-group">
+                    <label>Titre de l'étape</label>
+                    <input type="text" id="step-title" placeholder="Ex: Vol AF123, Visite du Colisée..." class="form-input" style="width: 100%; margin-bottom: 24px;" />
+                </div>
+                <div class="form-group">
+                    <label>Sous-titre (Heure ou lieu)</label>
+                    <input type="text" id="step-subtitle" placeholder="Ex: Départ 10h00, ou Billet réservé" class="form-input" style="width: 100%; margin-bottom: 24px;" />
+                </div>
+                <div class="form-group">
+                    <label>Type d'activité</label>
+                    <select id="step-icon" class="form-input" style="width: 100%; margin-bottom: 24px;">
+                        <option value="flight">Vol / Transport</option>
+                        <option value="hotel">Hôtel / Logement</option>
+                        <option value="restaurant">Restaurant</option>
+                        <option value="museum">Visite / Musée</option>
+                        <option value="directions_walk">Activité / Marche</option>
+                        <option value="beach_access">Plage / Détente</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Jour du voyage</label>
+                    <input type="number" id="step-day" placeholder="Ex: 1, 2, 3..." class="form-input" value="1" style="width: 100%; margin-bottom: 24px;" />
+                </div>
+            </div>
+        </div>
+
         <nav class="bottom-nav">
             <a href="#" class="nav-item active" data-target="view-home">
                 <span class="material-icons-round">explore</span>

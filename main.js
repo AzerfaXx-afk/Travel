@@ -7,70 +7,113 @@ if ('serviceWorker' in navigator) {
 
 // Global App State
 let state = {
-    trips: [],      // { id, name, dest, destImg, coords, pois, friends: [] }
+    trips: [],      // { id, name, dest, destImg, coords, pois, friends: [], itinerary: [] }
     expenses: [],   // { id, title, amount, payer }
     activeTripId: null
 };
 
-// Database of suggestions with coordinates and POIs for the map
+// Database of European destinations with coordinates and POIs for the map
 const DESTINATIONS = [
     { 
-        name: "Rome, Italie", 
-        img: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=400&q=80",
-        coords: [41.9028, 12.4964],
-        pois: [
-            { name: "Colisée", coords: [41.8902, 12.4922], icon: "museum" },
-            { name: "Vatican", coords: [41.9029, 12.4534], icon: "church" },
-            { name: "Fontaine de Trevi", coords: [41.9009, 12.4833], icon: "water" }
-        ]
-    },
-    { 
-        name: "Bali, Indonésie", 
-        img: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=400&q=80",
-        coords: [-8.4095, 115.1889],
-        pois: [
-            { name: "Ubud Monkey Forest", coords: [-8.5194, 115.2590], icon: "park" },
-            { name: "Mont Batur", coords: [-8.2414, 115.3770], icon: "terrain" },
-            { name: "Plage de Seminyak", coords: [-8.6913, 115.1610], icon: "beach_access" }
-        ]
-    },
-    { 
-        name: "Tulum, Mexique", 
-        img: "https://images.unsplash.com/photo-1518638150340-f706d86654de?auto=format&fit=crop&w=400&q=80",
-        coords: [20.2114, -87.4654],
-        pois: [
-            { name: "Ruines Maya", coords: [20.2150, -87.4295], icon: "account_balance" },
-            { name: "Cenote Dos Ojos", coords: [20.3204, -87.3972], icon: "pool" }
-        ]
-    },
-    { 
-        name: "Tokyo, Japon", 
-        img: "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=400&q=80",
-        coords: [35.6762, 139.6503],
-        pois: [
-            { name: "Shibuya Crossing", coords: [35.6595, 139.7004], icon: "directions_walk" },
-            { name: "Senso-ji", coords: [35.7147, 139.7966], icon: "temple_buddhist" },
-            { name: "Tokyo Tower", coords: [35.6586, 139.7454], icon: "cell_tower" }
-        ]
-    },
-    { 
-        name: "Santorin, Grèce", 
+        name: "Grèce (Athènes, Cyclades)", 
         img: "https://images.unsplash.com/photo-1516483638261-f40af5aa32c6?auto=format&fit=crop&w=400&q=80",
-        coords: [36.3932, 25.4615],
+        coords: [39.0742, 21.8243],
         pois: [
-            { name: "Oia Sunset View", coords: [36.4618, 25.3753], icon: "wb_sunny" },
-            { name: "Red Beach", coords: [36.3486, 25.3946], icon: "beach_access" },
-            { name: "Fira Center", coords: [36.4166, 25.4324], icon: "storefront" }
+            { name: "Acropole d'Athènes", coords: [37.9715, 23.7257], icon: "account_balance" },
+            { name: "Oia, Santorin", coords: [36.4618, 25.3753], icon: "wb_sunny" },
+            { name: "Météores", coords: [39.7126, 21.6267], icon: "terrain" },
+            { name: "Palais de Cnossos (Crète)", coords: [35.2981, 25.1632], icon: "museum" },
+            { name: "Plage de Navagio (Zakynthos)", coords: [37.8596, 20.6249], icon: "beach_access" }
         ]
     },
     { 
-        name: "Paris, France", 
-        img: "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&w=400&q=80",
-        coords: [48.8566, 2.3522],
+        name: "Italie", 
+        img: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=400&q=80",
+        coords: [41.8719, 12.5674],
         pois: [
-            { name: "Tour Eiffel", coords: [48.8584, 2.2945], icon: "tour" },
-            { name: "Louvre", coords: [48.8606, 2.3376], icon: "museum" },
-            { name: "Montmartre", coords: [48.8867, 2.3431], icon: "landscape" }
+            { name: "Colisée, Rome", coords: [41.8902, 12.4922], icon: "account_balance" },
+            { name: "Tour de Pise", coords: [43.7229, 10.3965], icon: "tour" },
+            { name: "Cinque Terre", coords: [44.1278, 9.7098], icon: "landscape" },
+            { name: "Côte Amalfitaine", coords: [40.6333, 14.6027], icon: "water" },
+            { name: "Venise (Canal Grande)", coords: [45.4382, 12.3323], icon: "sailing" }
+        ]
+    },
+    { 
+        name: "France", 
+        img: "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&w=400&q=80",
+        coords: [46.2276, 2.2137],
+        pois: [
+            { name: "Tour Eiffel, Paris", coords: [48.8584, 2.2945], icon: "tour" },
+            { name: "Mont Saint-Michel", coords: [48.6360, -1.5115], icon: "church" },
+            { name: "Gorges du Verdon", coords: [43.7408, 6.3197], icon: "terrain" },
+            { name: "Château de Versailles", coords: [48.8048, 2.1203], icon: "account_balance" },
+            { name: "Calanques de Marseille", coords: [43.2128, 5.4526], icon: "water" }
+        ]
+    },
+    {
+        name: "Espagne",
+        img: "https://images.unsplash.com/photo-1539037116277-4db20889f2d4?auto=format&fit=crop&w=400&q=80",
+        coords: [40.4637, -3.7492],
+        pois: [
+            { name: "Sagrada Familia, Barcelone", coords: [41.4036, 2.1744], icon: "church" },
+            { name: "Alhambra, Grenade", coords: [37.1760, -3.5881], icon: "account_balance" },
+            { name: "Plaza Mayor, Madrid", coords: [40.4153, -3.7073], icon: "location_city" },
+            { name: "Parc Güell", coords: [41.4145, 2.1527], icon: "park" },
+            { name: "Plage de Majorque", coords: [39.6952, 3.0175], icon: "beach_access" }
+        ]
+    },
+    {
+        name: "Portugal",
+        img: "https://images.unsplash.com/photo-1555881400-74d7acaacd8b?auto=format&fit=crop&w=400&q=80",
+        coords: [39.3998, -8.2244],
+        pois: [
+            { name: "Tour de Belém, Lisbonne", coords: [38.6915, -9.2159], icon: "tour" },
+            { name: "Palais de Pena, Sintra", coords: [38.7876, -9.3906], icon: "account_balance" },
+            { name: "Ribeira, Porto", coords: [41.1404, -8.6128], icon: "location_city" },
+            { name: "Grottes de Benagil, Algarve", coords: [37.0873, -8.4239], icon: "water" }
+        ]
+    },
+    {
+        name: "Croatie",
+        img: "https://images.unsplash.com/photo-1554907551-7890f6707310?auto=format&fit=crop&w=400&q=80",
+        coords: [45.1, 15.2],
+        pois: [
+            { name: "Murailles de Dubrovnik", coords: [42.6416, 18.1104], icon: "account_balance" },
+            { name: "Parc de Plitvice", coords: [44.8653, 15.5820], icon: "park" },
+            { name: "Palais de Dioclétien, Split", coords: [43.5079, 16.4401], icon: "museum" },
+            { name: "Hvar (Île)", coords: [43.1673, 16.4385], icon: "beach_access" }
+        ]
+    },
+    {
+        name: "Islande",
+        img: "https://images.unsplash.com/photo-1476610182048-b716b8518aae?auto=format&fit=crop&w=400&q=80",
+        coords: [64.9631, -19.0208],
+        pois: [
+            { name: "Blue Lagoon", coords: [63.8804, -22.4495], icon: "pool" },
+            { name: "Cascade de Gullfoss", coords: [64.3271, -20.1199], icon: "water" },
+            { name: "Plage de sable noir de Reynisfjara", coords: [63.4057, -19.0716], icon: "beach_access" },
+            { name: "Geysir", coords: [64.3104, -20.3024], icon: "wb_iridescent" }
+        ]
+    },
+    {
+        name: "Suisse",
+        img: "https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?auto=format&fit=crop&w=400&q=80",
+        coords: [46.8182, 8.2275],
+        pois: [
+            { name: "Le Cervin (Zermatt)", coords: [45.9763, 7.6586], icon: "terrain" },
+            { name: "Lac Léman", coords: [46.4312, 6.5262], icon: "water" },
+            { name: "Château de Chillon", coords: [46.4142, 6.9275], icon: "account_balance" }
+        ]
+    },
+    {
+        name: "Norvège",
+        img: "https://images.unsplash.com/photo-1513569771920-c9e1d31714af?auto=format&fit=crop&w=400&q=80",
+        coords: [60.4720, 8.4689],
+        pois: [
+            { name: "Fjord de Geiranger", coords: [62.1015, 7.0940], icon: "water" },
+            { name: "Îles Lofoten", coords: [68.1666, 13.7500], icon: "landscape" },
+            { name: "Preikestolen", coords: [58.9871, 6.1888], icon: "terrain" },
+            { name: "Tromsø (Aurores Boréales)", coords: [69.6492, 18.9553], icon: "wb_twilight" }
         ]
     }
 ];
@@ -80,7 +123,6 @@ let map = null;
 let markers = [];
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Hide Loader
     setTimeout(() => { document.getElementById('app-loader').classList.add('hidden'); }, 1000);
 
     // Theme Toggle
@@ -111,6 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (targetId === 'view-budget') renderBudget();
             if (targetId === 'view-map') initOrUpdateMap();
+            if (targetId === 'view-home') renderApp();
         });
     });
 
@@ -126,7 +169,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     btnOpenNewTrip.addEventListener('click', openNewTripModal);
 
-    // Live binding for the "Créer un voyage" button inside empty state
     document.body.addEventListener('click', (e) => {
         if(e.target && e.target.id === 'btn-create-first-trip') {
             openNewTripModal(e);
@@ -138,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Trip Creation Form State
-    let pendingTrip = { name: "", dest: null, destImg: "", coords: null, pois: [], friends: [] };
+    let pendingTrip = { name: "", dest: null, destImg: "", coords: null, pois: [], friends: [], itinerary: [] };
 
     const tripNameInput = document.getElementById('trip-name-input');
     const destInput = document.getElementById('destination-input');
@@ -229,7 +271,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const resetTripForm = () => {
-        pendingTrip = { name: "", dest: null, destImg: "", coords: null, pois: [], friends: [] };
+        pendingTrip = { name: "", dest: null, destImg: "", coords: null, pois: [], friends: [], itinerary: [] };
         tripNameInput.value = "";
         destInput.value = "";
         selectedDestDiv.style.display = 'none';
@@ -252,6 +294,39 @@ document.addEventListener('DOMContentLoaded', () => {
         
         modalNewTrip.classList.remove('show');
         renderApp();
+    });
+
+    // --- NEW STEP (ITINERARY) MODAL LOGIC ---
+    const modalNewStep = document.getElementById('modal-new-step');
+    
+    document.body.addEventListener('click', (e) => {
+        if(e.target && e.target.id === 'btn-open-step') {
+            modalNewStep.classList.add('show');
+            document.getElementById('step-title').value = '';
+            document.getElementById('step-subtitle').value = '';
+        }
+    });
+
+    document.querySelector('.close-modal-step').addEventListener('click', () => {
+        modalNewStep.classList.remove('show');
+    });
+
+    document.getElementById('btn-save-step').addEventListener('click', () => {
+        if (!state.activeTripId) return;
+        const activeTrip = state.trips.find(t => t.id === state.activeTripId);
+        
+        const title = document.getElementById('step-title').value;
+        const subtitle = document.getElementById('step-subtitle').value;
+        const icon = document.getElementById('step-icon').value;
+        const day = parseInt(document.getElementById('step-day').value) || 1;
+
+        if (title) {
+            activeTrip.itinerary.push({ title, subtitle, icon, day });
+            // Sort itinerary by day
+            activeTrip.itinerary.sort((a, b) => a.day - b.day);
+            modalNewStep.classList.remove('show');
+            renderTimeline();
+        }
     });
 
     // --- APP RENDERING ---
@@ -303,28 +378,38 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const activeTrip = state.trips[0]; // Active trip
-        container.innerHTML = `
-            <div class="timeline-item">
-                <div class="timeline-time">Bientôt</div>
-                <div class="timeline-dot flight"><span class="material-icons-round">flight</span></div>
-                <div class="timeline-content">
-                    <h4>Vol vers ${activeTrip.dest}</h4>
-                    <p>Départ à programmer</p>
-                </div>
-            </div>
-            ${activeTrip.pois.map((poi, idx) => `
-                <div class="timeline-item">
-                    <div class="timeline-time">Visite</div>
-                    <div class="timeline-dot" style="background: var(--primary);"><span class="material-icons-round">${poi.icon}</span></div>
-                    <div class="timeline-content">
-                        <h4>${poi.name}</h4>
-                        <p>Point d'intérêt suggéré</p>
+        const activeTrip = state.trips.find(t => t.id === state.activeTripId);
+        
+        let html = '';
+        if (activeTrip.itinerary.length === 0) {
+            html += `<p style="text-align:center; color: var(--text-muted); font-size:14px; margin-bottom: 16px;">Votre programme est vide. Ajoutez vos vols, hôtels et visites !</p>`;
+        } else {
+            // Group by Day (Simplified)
+            let currentDay = -1;
+            activeTrip.itinerary.forEach(step => {
+                if (step.day !== currentDay) {
+                    html += `<h4 style="margin: 16px 0 8px; color: var(--primary);">Jour ${step.day}</h4>`;
+                    currentDay = step.day;
+                }
+                
+                let dotColor = "var(--primary)";
+                if (step.icon === 'flight') dotColor = "var(--secondary)";
+                if (step.icon === 'hotel') dotColor = "var(--accent)";
+
+                html += `
+                    <div class="timeline-item">
+                        <div class="timeline-dot" style="background: ${dotColor};"><span class="material-icons-round">${step.icon}</span></div>
+                        <div class="timeline-content">
+                            <h4>${step.title}</h4>
+                            <p>${step.subtitle}</p>
+                        </div>
                     </div>
-                </div>
-            `).join('')}
-            <button class="text-btn primary" style="width:100%; padding:12px; border: 1px dashed var(--primary); border-radius: var(--radius-sm); margin-top:12px;">+ Ajouter une étape</button>
-        `;
+                `;
+            });
+        }
+        
+        html += `<button class="text-btn primary" id="btn-open-step" style="width:100%; padding:12px; border: 1px dashed var(--primary); border-radius: var(--radius-sm); margin-top:12px;">+ Ajouter une étape</button>`;
+        container.innerHTML = html;
     };
 
     const renderBudget = () => {
@@ -377,11 +462,10 @@ document.addEventListener('DOMContentLoaded', () => {
         html += `</div>`;
         container.innerHTML = html;
 
-        // Bind new expense button
         const btnOpenExpense = document.getElementById('btn-open-expense');
         if(btnOpenExpense) {
             btnOpenExpense.addEventListener('click', () => {
-                const activeTrip = state.trips[0];
+                const activeTrip = state.trips.find(t => t.id === state.activeTripId);
                 const selectPayer = document.getElementById('expense-payer');
                 selectPayer.innerHTML = `<option value="Adam">Moi (Adam)</option>` + 
                     activeTrip.friends.map(f => `<option value="${f}">${f}</option>`).join('');
@@ -411,43 +495,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // MAP LOGIC (LEAFLET)
     const initOrUpdateMap = () => {
-        // If no trip is created, show default world view
-        let centerCoords = [20, 0];
-        let zoomLevel = 2;
-        let activeTrip = state.trips.length > 0 ? state.trips[0] : null;
+        let centerCoords = [46.2276, 2.2137]; // Default to Europe center roughly
+        let zoomLevel = 4;
+        let activeTrip = state.trips.length > 0 ? state.trips.find(t => t.id === state.activeTripId) : null;
 
         if (activeTrip && activeTrip.coords) {
             centerCoords = activeTrip.coords;
-            zoomLevel = 10;
+            zoomLevel = 6;
         }
 
         if (!map) {
-            // Initialize map
             map = L.map('map', { zoomControl: false }).setView(centerCoords, zoomLevel);
-            
-            // Add OpenStreetMap tiles
             L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+                attribution: '&copy; OpenStreetMap',
                 subdomains: 'abcd',
                 maxZoom: 19
             }).addTo(map);
-
-            // Add zoom control manually to bottom right
             L.control.zoom({ position: 'bottomright' }).addTo(map);
         } else {
-            // Update view
             map.setView(centerCoords, zoomLevel);
         }
 
-        // Clear old markers
         markers.forEach(m => map.removeLayer(m));
         markers = [];
 
-        // Add markers for active trip POIs
         if (activeTrip && activeTrip.pois) {
             activeTrip.pois.forEach(poi => {
                 const iconHtml = `<div style="background:var(--primary); color:white; width:36px; height:36px; border-radius:50%; display:flex; justify-content:center; align-items:center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); border: 2px solid white;"><span class="material-icons-round" style="font-size:20px;">${poi.icon}</span></div>`;
-                
                 const customIcon = L.divIcon({
                     html: iconHtml,
                     className: 'custom-leaflet-marker',
@@ -455,15 +529,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     iconAnchor: [18, 36],
                     popupAnchor: [0, -36]
                 });
-
                 const marker = L.marker(poi.coords, { icon: customIcon })
                     .addTo(map)
                     .bindPopup(`<b>${poi.name}</b><br>Recommandation Odyssée`);
-                
                 markers.push(marker);
             });
-            
-            // Wait for map container to fully render if tab was just changed
             setTimeout(() => { map.invalidateSize(); }, 300);
         }
     };
