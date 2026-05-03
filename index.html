@@ -158,21 +158,26 @@
                 
                 <div class="form-group">
                     <label>Destination</label>
-                    <div class="search-container" style="margin-bottom: 16px;">
-                        <span class="material-icons-round search-icon">public</span>
-                        <input type="text" id="destination-input" placeholder="Ex: Japon, Bali, Mexique..." class="search-input" />
+                    <div class="search-bar" id="destination-input-container">
+                        <span class="material-icons-round">public</span>
+                        <input type="text" id="destination-input" placeholder="Ex: Italie, Grèce, Espagne..." style="border:none; background:transparent; color:var(--text); width:100%; outline:none;" autocomplete="off" />
                     </div>
-                    <!-- Selected Destination Badge -->
-                    <div id="selected-destination" style="display: none; align-items: center; gap: 8px; margin-bottom: 16px; padding: 8px 12px; background: var(--primary); color: white; border-radius: var(--radius-sm); font-weight: 600; width: fit-content;">
-                        <span class="material-icons-round" style="font-size: 18px;">location_on</span>
-                        <span id="selected-dest-name"></span>
-                        <span class="material-icons-round" id="remove-destination" style="font-size: 18px; cursor: pointer; margin-left: 8px;">close</span>
+                    
+                    <div id="selected-destination" class="selected-dest" style="display: none;">
+                        <span class="material-icons-round">check_circle</span>
+                        <span id="selected-dest-name">Grèce</span>
+                        <button class="icon-btn" id="remove-destination" style="margin-left: auto; width: 32px; height: 32px;"><span class="material-icons-round" style="font-size: 18px;">close</span></button>
+                    </div>
+
+                    <div class="dest-suggestions" id="destination-suggestions">
+                        <!-- Filled by JS -->
                     </div>
                 </div>
 
-                <!-- Suggestions Grid -->
-                <div id="destination-suggestions" class="suggestions-grid">
-                    <!-- JS renders here -->
+                <div class="form-group">
+                    <label>Durée du voyage (en jours)</label>
+                    <input type="number" id="trip-duration-input" class="form-input" placeholder="Ex: 7" value="7" style="width: 100%;" min="1" max="30" />
+                    <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Odyssée génèrera un programme sur mesure selon la durée.</p>
                 </div>
 
                 <div class="form-group" style="margin-top: 32px;">

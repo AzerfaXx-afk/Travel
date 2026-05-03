@@ -7,16 +7,16 @@ if ('serviceWorker' in navigator) {
 
 // Global App State
 let state = {
-    trips: [],      // { id, name, dest, destImg, coords, pois, friends: [], itinerary: [] }
+    trips: [],      // { id, name, dest, destImg, coords, pois, friends: [], itinerary: [], duration: 1 }
     expenses: [],   // { id, title, amount, payer }
     activeTripId: null
 };
 
-// Database of European destinations with coordinates and POIs for the map
+// Database of European destinations with reliable Unsplash IDs
 const DESTINATIONS = [
     { 
-        name: "Grèce (Athènes, Cyclades)", 
-        img: "https://images.unsplash.com/photo-1516483638261-f40af5aa32c6?auto=format&fit=crop&w=400&q=80",
+        name: "Grèce", 
+        img: "https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=600&q=80",
         coords: [39.0742, 21.8243],
         pois: [
             { name: "Acropole d'Athènes", coords: [37.9715, 23.7257], icon: "account_balance" },
@@ -28,7 +28,7 @@ const DESTINATIONS = [
     },
     { 
         name: "Italie", 
-        img: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=400&q=80",
+        img: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=600&q=80",
         coords: [41.8719, 12.5674],
         pois: [
             { name: "Colisée, Rome", coords: [41.8902, 12.4922], icon: "account_balance" },
@@ -40,7 +40,7 @@ const DESTINATIONS = [
     },
     { 
         name: "France", 
-        img: "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&w=400&q=80",
+        img: "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&w=600&q=80",
         coords: [46.2276, 2.2137],
         pois: [
             { name: "Tour Eiffel, Paris", coords: [48.8584, 2.2945], icon: "tour" },
@@ -52,7 +52,7 @@ const DESTINATIONS = [
     },
     {
         name: "Espagne",
-        img: "https://images.unsplash.com/photo-1539037116277-4db20889f2d4?auto=format&fit=crop&w=400&q=80",
+        img: "https://images.unsplash.com/photo-1539037116277-4db20889f2d4?auto=format&fit=crop&w=600&q=80",
         coords: [40.4637, -3.7492],
         pois: [
             { name: "Sagrada Familia, Barcelone", coords: [41.4036, 2.1744], icon: "church" },
@@ -64,7 +64,7 @@ const DESTINATIONS = [
     },
     {
         name: "Portugal",
-        img: "https://images.unsplash.com/photo-1555881400-74d7acaacd8b?auto=format&fit=crop&w=400&q=80",
+        img: "https://images.unsplash.com/photo-1555881400-74d7acaacd8b?auto=format&fit=crop&w=600&q=80",
         coords: [39.3998, -8.2244],
         pois: [
             { name: "Tour de Belém, Lisbonne", coords: [38.6915, -9.2159], icon: "tour" },
@@ -75,7 +75,7 @@ const DESTINATIONS = [
     },
     {
         name: "Croatie",
-        img: "https://images.unsplash.com/photo-1554907551-7890f6707310?auto=format&fit=crop&w=400&q=80",
+        img: "https://images.unsplash.com/photo-1555026414-b81b83dd4f64?auto=format&fit=crop&w=600&q=80",
         coords: [45.1, 15.2],
         pois: [
             { name: "Murailles de Dubrovnik", coords: [42.6416, 18.1104], icon: "account_balance" },
@@ -86,7 +86,7 @@ const DESTINATIONS = [
     },
     {
         name: "Islande",
-        img: "https://images.unsplash.com/photo-1476610182048-b716b8518aae?auto=format&fit=crop&w=400&q=80",
+        img: "https://images.unsplash.com/photo-1476610182048-b716b8518aae?auto=format&fit=crop&w=600&q=80",
         coords: [64.9631, -19.0208],
         pois: [
             { name: "Blue Lagoon", coords: [63.8804, -22.4495], icon: "pool" },
@@ -97,7 +97,7 @@ const DESTINATIONS = [
     },
     {
         name: "Suisse",
-        img: "https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?auto=format&fit=crop&w=400&q=80",
+        img: "https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?auto=format&fit=crop&w=600&q=80",
         coords: [46.8182, 8.2275],
         pois: [
             { name: "Le Cervin (Zermatt)", coords: [45.9763, 7.6586], icon: "terrain" },
@@ -107,7 +107,7 @@ const DESTINATIONS = [
     },
     {
         name: "Norvège",
-        img: "https://images.unsplash.com/photo-1513569771920-c9e1d31714af?auto=format&fit=crop&w=400&q=80",
+        img: "https://images.unsplash.com/photo-1506501139174-099022df5260?auto=format&fit=crop&w=600&q=80",
         coords: [60.4720, 8.4689],
         pois: [
             { name: "Fjord de Geiranger", coords: [62.1015, 7.0940], icon: "water" },
@@ -180,10 +180,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Trip Creation Form State
-    let pendingTrip = { name: "", dest: null, destImg: "", coords: null, pois: [], friends: [], itinerary: [] };
+    let pendingTrip = { name: "", dest: null, destImg: "", coords: null, pois: [], friends: [], itinerary: [], duration: 1 };
 
     const tripNameInput = document.getElementById('trip-name-input');
     const destInput = document.getElementById('destination-input');
+    const durationInput = document.getElementById('trip-duration-input');
     const suggestionsGrid = document.getElementById('destination-suggestions');
     const selectedDestDiv = document.getElementById('selected-destination');
     const selectedDestName = document.getElementById('selected-dest-name');
@@ -203,6 +204,10 @@ document.addEventListener('DOMContentLoaded', () => {
     tripNameInput.addEventListener('input', (e) => {
         pendingTrip.name = e.target.value;
         validateForm();
+    });
+    
+    durationInput.addEventListener('input', (e) => {
+        pendingTrip.duration = parseInt(e.target.value) || 1;
     });
 
     const renderSuggestions = (query = "") => {
@@ -271,9 +276,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const resetTripForm = () => {
-        pendingTrip = { name: "", dest: null, destImg: "", coords: null, pois: [], friends: [], itinerary: [] };
+        pendingTrip = { name: "", dest: null, destImg: "", coords: null, pois: [], friends: [], itinerary: [], duration: 7 };
         tripNameInput.value = "";
         destInput.value = "";
+        durationInput.value = 7;
         selectedDestDiv.style.display = 'none';
         suggestionsGrid.style.display = 'grid';
         destInput.style.display = 'block';
@@ -283,8 +289,51 @@ document.addEventListener('DOMContentLoaded', () => {
         validateForm();
     };
 
+    // --- AUTO-GENERATE ITINERARY LOGIC ---
+    const generateSmartItinerary = (trip) => {
+        const it = [];
+        const duration = trip.duration;
+        const destName = trip.dest;
+        
+        // Day 1
+        it.push({ day: 1, title: `Vol vers ${destName}`, subtitle: "Arrivée et check-in à l'hôtel", icon: "flight" });
+        if (duration > 1 && trip.pois.length > 0) {
+            it.push({ day: 1, title: "Découverte des environs", subtitle: "Balade légère et restaurant local", icon: "restaurant" });
+        }
+
+        // Middle Days (distribute POIs)
+        if (duration > 2) {
+            let poiIndex = 0;
+            for (let d = 2; d < duration; d++) {
+                if (poiIndex < trip.pois.length) {
+                    let poi = trip.pois[poiIndex];
+                    it.push({ day: d, title: `Visite : ${poi.name}`, subtitle: "Recommandation Odyssée", icon: poi.icon });
+                    poiIndex++;
+                } else {
+                    it.push({ day: d, title: "Journée libre", subtitle: "Shopping ou détente à la plage", icon: "beach_access" });
+                }
+                
+                // Add a restaurant every other day
+                if (d % 2 === 0) {
+                    it.push({ day: d, title: "Dîner gastronomique", subtitle: "Réservation suggérée", icon: "restaurant" });
+                }
+            }
+        }
+
+        // Last Day
+        if (duration > 1) {
+            it.push({ day: duration, title: "Derniers achats", subtitle: "Souvenirs et photos", icon: "local_mall" });
+            it.push({ day: duration, title: "Vol retour", subtitle: "Départ pour la maison", icon: "flight_takeoff" });
+        }
+
+        return it;
+    };
+
     // CREATE TRIP ACTION
     btnCreateTrip.addEventListener('click', () => {
+        // Auto-generate itinerary
+        pendingTrip.itinerary = generateSmartItinerary(pendingTrip);
+
         const newTrip = {
             id: Date.now(),
             ...pendingTrip
@@ -304,6 +353,10 @@ document.addEventListener('DOMContentLoaded', () => {
             modalNewStep.classList.add('show');
             document.getElementById('step-title').value = '';
             document.getElementById('step-subtitle').value = '';
+            const activeTrip = state.trips.find(t => t.id === state.activeTripId);
+            if (activeTrip) {
+                document.getElementById('step-day').value = 1;
+            }
         }
     });
 
@@ -356,8 +409,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 <div class="trip-info">
                     <h4>${trip.name}</h4>
-                    <p>${trip.dest}</p>
-                    <div class="trip-friends">
+                    <p>Voyage de ${trip.duration} jours</p>
+                    <div class="trip-friends" style="margin-top: 8px;">
                         <img src="https://ui-avatars.com/api/?name=Adam&background=FF7B54&color=fff&rounded=true" class="friend-avatar" />
                         ${trip.friends.map(f => `<img src="https://ui-avatars.com/api/?name=${f}&background=random&color=fff&rounded=true" class="friend-avatar" />`).join('')}
                     </div>
@@ -393,7 +446,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 
                 let dotColor = "var(--primary)";
-                if (step.icon === 'flight') dotColor = "var(--secondary)";
+                if (step.icon === 'flight' || step.icon === 'flight_takeoff') dotColor = "var(--secondary)";
                 if (step.icon === 'hotel') dotColor = "var(--accent)";
 
                 html += `
@@ -473,25 +526,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     };
-
-    // Add Expense Modal Logic
-    document.querySelector('.close-modal-expense').addEventListener('click', () => {
-        document.getElementById('modal-new-expense').classList.remove('show');
-    });
-
-    document.getElementById('btn-save-expense').addEventListener('click', () => {
-        const title = document.getElementById('expense-title').value;
-        const amount = parseFloat(document.getElementById('expense-amount').value);
-        const payer = document.getElementById('expense-payer').value;
-
-        if(title && amount > 0) {
-            state.expenses.push({ id: Date.now(), title, amount, payer });
-            document.getElementById('expense-title').value = '';
-            document.getElementById('expense-amount').value = '';
-            document.getElementById('modal-new-expense').classList.remove('show');
-            renderBudget();
-        }
-    });
 
     // MAP LOGIC (LEAFLET)
     const initOrUpdateMap = () => {
