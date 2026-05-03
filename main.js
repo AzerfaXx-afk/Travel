@@ -7,20 +7,77 @@ if ('serviceWorker' in navigator) {
 
 // Global App State
 let state = {
-    trips: [],      // { id, name, dest, destImg, friends: [] }
+    trips: [],      // { id, name, dest, destImg, coords, pois, friends: [] }
     expenses: [],   // { id, title, amount, payer }
     activeTripId: null
 };
 
-// Database of suggestions
+// Database of suggestions with coordinates and POIs for the map
 const DESTINATIONS = [
-    { name: "Rome, Italie", img: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=400&q=80" },
-    { name: "Bali, Indonésie", img: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=400&q=80" },
-    { name: "Tulum, Mexique", img: "https://images.unsplash.com/photo-1518638150340-f706d86654de?auto=format&fit=crop&w=400&q=80" },
-    { name: "Tokyo, Japon", img: "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=400&q=80" },
-    { name: "Santorin, Grèce", img: "https://images.unsplash.com/photo-1516483638261-f40af5aa32c6?auto=format&fit=crop&w=400&q=80" },
-    { name: "Paris, France", img: "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&w=400&q=80" }
+    { 
+        name: "Rome, Italie", 
+        img: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=400&q=80",
+        coords: [41.9028, 12.4964],
+        pois: [
+            { name: "Colisée", coords: [41.8902, 12.4922], icon: "museum" },
+            { name: "Vatican", coords: [41.9029, 12.4534], icon: "church" },
+            { name: "Fontaine de Trevi", coords: [41.9009, 12.4833], icon: "water" }
+        ]
+    },
+    { 
+        name: "Bali, Indonésie", 
+        img: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=400&q=80",
+        coords: [-8.4095, 115.1889],
+        pois: [
+            { name: "Ubud Monkey Forest", coords: [-8.5194, 115.2590], icon: "park" },
+            { name: "Mont Batur", coords: [-8.2414, 115.3770], icon: "terrain" },
+            { name: "Plage de Seminyak", coords: [-8.6913, 115.1610], icon: "beach_access" }
+        ]
+    },
+    { 
+        name: "Tulum, Mexique", 
+        img: "https://images.unsplash.com/photo-1518638150340-f706d86654de?auto=format&fit=crop&w=400&q=80",
+        coords: [20.2114, -87.4654],
+        pois: [
+            { name: "Ruines Maya", coords: [20.2150, -87.4295], icon: "account_balance" },
+            { name: "Cenote Dos Ojos", coords: [20.3204, -87.3972], icon: "pool" }
+        ]
+    },
+    { 
+        name: "Tokyo, Japon", 
+        img: "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=400&q=80",
+        coords: [35.6762, 139.6503],
+        pois: [
+            { name: "Shibuya Crossing", coords: [35.6595, 139.7004], icon: "directions_walk" },
+            { name: "Senso-ji", coords: [35.7147, 139.7966], icon: "temple_buddhist" },
+            { name: "Tokyo Tower", coords: [35.6586, 139.7454], icon: "cell_tower" }
+        ]
+    },
+    { 
+        name: "Santorin, Grèce", 
+        img: "https://images.unsplash.com/photo-1516483638261-f40af5aa32c6?auto=format&fit=crop&w=400&q=80",
+        coords: [36.3932, 25.4615],
+        pois: [
+            { name: "Oia Sunset View", coords: [36.4618, 25.3753], icon: "wb_sunny" },
+            { name: "Red Beach", coords: [36.3486, 25.3946], icon: "beach_access" },
+            { name: "Fira Center", coords: [36.4166, 25.4324], icon: "storefront" }
+        ]
+    },
+    { 
+        name: "Paris, France", 
+        img: "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&w=400&q=80",
+        coords: [48.8566, 2.3522],
+        pois: [
+            { name: "Tour Eiffel", coords: [48.8584, 2.2945], icon: "tour" },
+            { name: "Louvre", coords: [48.8606, 2.3376], icon: "museum" },
+            { name: "Montmartre", coords: [48.8867, 2.3431], icon: "landscape" }
+        ]
+    }
 ];
+
+// Leaflet Map instance
+let map = null;
+let markers = [];
 
 document.addEventListener('DOMContentLoaded', () => {
     // Hide Loader
@@ -51,14 +108,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 view.classList.remove('active');
                 if (view.id === targetId) view.classList.add('active');
             });
+            
             if (targetId === 'view-budget') renderBudget();
+            if (targetId === 'view-map') initOrUpdateMap();
         });
     });
 
     // Modal New Trip logic
     const modalNewTrip = document.getElementById('modal-new-trip');
     const btnOpenNewTrip = document.getElementById('btn-open-new-trip');
-    const btnCreateFirstTrip = document.getElementById('btn-create-first-trip');
     
     const openNewTripModal = (e) => {
         if(e) e.preventDefault();
@@ -67,14 +125,20 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     btnOpenNewTrip.addEventListener('click', openNewTripModal);
-    if(btnCreateFirstTrip) btnCreateFirstTrip.addEventListener('click', openNewTripModal);
+
+    // Live binding for the "Créer un voyage" button inside empty state
+    document.body.addEventListener('click', (e) => {
+        if(e.target && e.target.id === 'btn-create-first-trip') {
+            openNewTripModal(e);
+        }
+    });
 
     document.querySelector('.close-modal').addEventListener('click', () => {
         modalNewTrip.classList.remove('show');
     });
 
     // Trip Creation Form State
-    let pendingTrip = { name: "", dest: null, destImg: "", friends: [] };
+    let pendingTrip = { name: "", dest: null, destImg: "", coords: null, pois: [], friends: [] };
 
     const tripNameInput = document.getElementById('trip-name-input');
     const destInput = document.getElementById('destination-input');
@@ -113,6 +177,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const item = filtered[card.getAttribute('data-index')];
                 pendingTrip.dest = item.name;
                 pendingTrip.destImg = item.img;
+                pendingTrip.coords = item.coords;
+                pendingTrip.pois = item.pois;
                 selectedDestName.textContent = item.name;
                 selectedDestDiv.style.display = 'flex';
                 suggestionsGrid.style.display = 'none';
@@ -126,6 +192,8 @@ document.addEventListener('DOMContentLoaded', () => {
     removeDestBtn.addEventListener('click', () => {
         pendingTrip.dest = null;
         pendingTrip.destImg = "";
+        pendingTrip.coords = null;
+        pendingTrip.pois = [];
         selectedDestDiv.style.display = 'none';
         suggestionsGrid.style.display = 'grid';
         destInput.style.display = 'block';
@@ -161,7 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const resetTripForm = () => {
-        pendingTrip = { name: "", dest: null, destImg: "", friends: [] };
+        pendingTrip = { name: "", dest: null, destImg: "", coords: null, pois: [], friends: [] };
         tripNameInput.value = "";
         destInput.value = "";
         selectedDestDiv.style.display = 'none';
@@ -200,6 +268,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="empty-state" style="text-align: center; width: 100%;">
                     <span class="material-icons-round" style="font-size: 48px; color: var(--border-color);">luggage</span>
                     <p style="color: var(--text-muted); margin-top: 8px;">Aucun voyage prévu.</p>
+                    <button class="text-btn primary" id="btn-create-first-trip" style="margin-top: 8px;">Créer un voyage</button>
                 </div>
             `;
             return;
@@ -234,15 +303,26 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        const activeTrip = state.trips[0]; // Active trip
         container.innerHTML = `
             <div class="timeline-item">
                 <div class="timeline-time">Bientôt</div>
                 <div class="timeline-dot flight"><span class="material-icons-round">flight</span></div>
                 <div class="timeline-content">
-                    <h4>Vol vers ${state.trips[0].dest}</h4>
-                    <p>À programmer</p>
+                    <h4>Vol vers ${activeTrip.dest}</h4>
+                    <p>Départ à programmer</p>
                 </div>
             </div>
+            ${activeTrip.pois.map((poi, idx) => `
+                <div class="timeline-item">
+                    <div class="timeline-time">Visite</div>
+                    <div class="timeline-dot" style="background: var(--primary);"><span class="material-icons-round">${poi.icon}</span></div>
+                    <div class="timeline-content">
+                        <h4>${poi.name}</h4>
+                        <p>Point d'intérêt suggéré</p>
+                    </div>
+                </div>
+            `).join('')}
             <button class="text-btn primary" style="width:100%; padding:12px; border: 1px dashed var(--primary); border-radius: var(--radius-sm); margin-top:12px;">+ Ajouter une étape</button>
         `;
     };
@@ -301,7 +381,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const btnOpenExpense = document.getElementById('btn-open-expense');
         if(btnOpenExpense) {
             btnOpenExpense.addEventListener('click', () => {
-                const activeTrip = state.trips[0]; // simplify for MVP
+                const activeTrip = state.trips[0];
                 const selectPayer = document.getElementById('expense-payer');
                 selectPayer.innerHTML = `<option value="Adam">Moi (Adam)</option>` + 
                     activeTrip.friends.map(f => `<option value="${f}">${f}</option>`).join('');
@@ -328,6 +408,65 @@ document.addEventListener('DOMContentLoaded', () => {
             renderBudget();
         }
     });
+
+    // MAP LOGIC (LEAFLET)
+    const initOrUpdateMap = () => {
+        // If no trip is created, show default world view
+        let centerCoords = [20, 0];
+        let zoomLevel = 2;
+        let activeTrip = state.trips.length > 0 ? state.trips[0] : null;
+
+        if (activeTrip && activeTrip.coords) {
+            centerCoords = activeTrip.coords;
+            zoomLevel = 10;
+        }
+
+        if (!map) {
+            // Initialize map
+            map = L.map('map', { zoomControl: false }).setView(centerCoords, zoomLevel);
+            
+            // Add OpenStreetMap tiles
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+                subdomains: 'abcd',
+                maxZoom: 19
+            }).addTo(map);
+
+            // Add zoom control manually to bottom right
+            L.control.zoom({ position: 'bottomright' }).addTo(map);
+        } else {
+            // Update view
+            map.setView(centerCoords, zoomLevel);
+        }
+
+        // Clear old markers
+        markers.forEach(m => map.removeLayer(m));
+        markers = [];
+
+        // Add markers for active trip POIs
+        if (activeTrip && activeTrip.pois) {
+            activeTrip.pois.forEach(poi => {
+                const iconHtml = `<div style="background:var(--primary); color:white; width:36px; height:36px; border-radius:50%; display:flex; justify-content:center; align-items:center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); border: 2px solid white;"><span class="material-icons-round" style="font-size:20px;">${poi.icon}</span></div>`;
+                
+                const customIcon = L.divIcon({
+                    html: iconHtml,
+                    className: 'custom-leaflet-marker',
+                    iconSize: [36, 36],
+                    iconAnchor: [18, 36],
+                    popupAnchor: [0, -36]
+                });
+
+                const marker = L.marker(poi.coords, { icon: customIcon })
+                    .addTo(map)
+                    .bindPopup(`<b>${poi.name}</b><br>Recommandation Odyssée`);
+                
+                markers.push(marker);
+            });
+            
+            // Wait for map container to fully render if tab was just changed
+            setTimeout(() => { map.invalidateSize(); }, 300);
+        }
+    };
 
     // Pull to Refresh
     const appContent = document.getElementById('app-content');

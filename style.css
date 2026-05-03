@@ -214,3 +214,8 @@ input:checked + .slider:before { transform: translateX(22px); }
   border-color: var(--primary);
 }
 
+
+.leaflet-control-zoom { bottom: 100px !important; right: 20px !important; border: none !important; box-shadow: var(--shadow-md) !important; }
+.leaflet-control-zoom a { color: var(--primary) !important; font-family: var(--font-main) !important; }
+.leaflet-container { font-family: var(--font-main) !important; }
+
